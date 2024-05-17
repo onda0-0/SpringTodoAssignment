@@ -3,6 +3,7 @@ package com.sparta.springboardprac1.dto;
 import com.sparta.springboardprac1.entity.Todo;
 import lombok.Getter;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,8 +12,8 @@ public class TodoResponseDto {
     private String username;
     private String title;
     private String contents;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public TodoResponseDto(Todo todo) {
         this.id = todo.getId();

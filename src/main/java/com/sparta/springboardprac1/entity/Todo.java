@@ -29,6 +29,5 @@ public class Todo {
         this.title=requestDto.getTitle();
         this.contents=requestDto.getContents();
         this.password=requestDto.getPassword();
-
     }
 }

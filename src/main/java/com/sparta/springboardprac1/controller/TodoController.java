@@ -16,17 +16,32 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/todos")
 public class TodoController {
     private final JdbcTemplate jdbcTemplate;
     public TodoController(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    private RowMapper<Todo> todoRowMapper() {
+        return (rs, rowNum) -> {
+            Todo todo = new Todo();
+            todo.setId(rs.getLong("id"));
+            todo.setUsername(rs.getString("username"));
+            todo.setTitle(rs.getString("title"));
+            todo.setContents(rs.getString("contents"));
+            todo.setPassword(rs.getString("password"));
+            todo.setCreatedAt(rs.getTimestamp("createdAt"));
+            todo.setUpdatedAt(rs.getTimestamp("updatedAt"));
+            return todo;
+        };
+    }
+
     //일정등록
-    @PostMapping("/todos")
+    @PostMapping
     public TodoResponseDto createTodo(@RequestBody TodoRequestDto requestDto) {
         Todo todo = new Todo(requestDto);
 
@@ -59,80 +74,51 @@ public class TodoController {
         return todoResponseDto;
 
     }
-
     //전체일정조회
-    @GetMapping("/todos")
-    public List<TodoResponseDto> getTodos() {
-        // Map To List
-        List<TodoResponseDto> responseList = todoList.values().stream()
-                .map(TodoResponseDto::new).toList();
+    @GetMapping
+    public List<TodoResponseDto> getAllTodos(){
+        String sql = "SELECT * FROM todo order by createdAt DESC";
 
-        return responseList;
+        List<Todo> todos = jdbcTemplate.query(sql, todoRowMapper());
+        return todos.stream().map(TodoResponseDto::new).collect(Collectors.toList());
     }
 
     //선택일정조회
-    @GetMapping("/todos/{id}")
-    public List<TodoResponseDto> getTodos(Long id){
+    @GetMapping("/{id}")
+    public TodoResponseDto  getTodoById(@PathVariable Long id){
         String sql = "SELECT * FROM todo WHERE id = ?";
 
-        return jdbcTemplate.query(sql, new RowMapper<TodoResponseDto>() {
-            @Override
-            public TodoResponseDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Long id = rs.getLong("id");
-                String title = rs.getString("title");
-                String content = rs.getString("content");
-                String manager = rs.getString("username");
-                Timestamp createdAt = rs.getTimestamp("createdAt");
-                Timestamp updatedAt = rs.getTimestamp("updatedAt");
-                return new TodoResponseDto(id, title, content, manager, createdAt,updatedAt);
-            }
-        }, id);
+        Todo todo = jdbcTemplate.queryForObject(sql, new Object[]{id}, todoRowMapper());
+        return new TodoResponseDto(todo);
     }
 
-    @GetMapping("/Todo/All")
-    public List<TodoResponseDto> getAllTodo(){
-        String sql = "SELECT * FROM Todo order by date DESC";
+    //선택일정수정
+    @PutMapping("/{id}")
+    public TodoResponseDto updateTodo(@PathVariable Long id, @RequestBody TodoRequestDto requestDto) {
+        String sqlSelect = "SELECT * FROM todo WHERE id = ?";
+        Todo todo = jdbcTemplate.queryForObject(sqlSelect, new Object[]{id}, todoRowMapper());
 
-        return jdbcTemplate.query(sql, new RowMapper<TodoResponseDto>() {
-            @Override
-            public TodoResponseDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Long id = rs.getLong("id");
-                String title = rs.getString("title");
-                String content = rs.getString("content");
-                String manager = rs.getString("manager");
-                String date = rs.getString("date");
-                return new TodoResponseDto(id, title, content, manager, date);
-            }
-        });
-    }
-
-    @PutMapping("/Todo")
-    public Long updateTodo(@RequestParam Long id, @RequestParam String password, @RequestBody TodoRequestDto requestDto) {
-        Todo Todo = findIdPwd(id, password);
-        if(Todo != null) {
-            String sql = "UPDATE Todo SET title = ?, content = ?, manager = ? WHERE id = ? AND password = ?";
-            jdbcTemplate.update(sql, requestDto.getTitle(), requestDto.getContent(), requestDto.getManager(), id, password);
-
-            return id;
-        } else {
-            throw new IllegalArgumentException("일정이 존재하지 않습니다.");
+        if (todo == null) {
+            throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
         }
+
+        todo.setTitle(requestDto.getTitle());
+        todo.setContents(requestDto.getContents());
+        todo.setPassword(requestDto.getPassword());
+        todo.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+
+        String sqlUpdate = "UPDATE todo SET title = ?, contents = ?, password = ?, updatedAt = ? WHERE id = ?";
+        jdbcTemplate.update(sqlUpdate, todo.getTitle(), todo.getContents(), todo.getPassword(), todo.getUpdatedAt(), id);
+        return new TodoResponseDto(todo);
     }
 
-    @DeleteMapping("/Todo")
-    public Long deleteTodo(@RequestParam Long id, @RequestParam String password){
-        Todo Todo = findIdPwd(id, password);
-        if(Todo != null){
-            String sql = "DELETE FROM Todo WHERE id = ? AND password = ?";
-            jdbcTemplate.update(sql, id, password);
-
-            return id;
-        } else{
-            throw new IllegalArgumentException("일정이 존재하지 않습니다.");
-        }
+    @DeleteMapping("/{id}")
+    public void deleteTodo(@PathVariable Long id) {
+        String sql = "DELETE FROM todo WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
-    private Todo findIdPwd(Long id, String password) {
+   /* private Todo findIdPwd(Long id, String password) {
         String sql = "SELECT * FROM Todo WHERE id = ? AND password = ?";
 
         return jdbcTemplate.query(sql, resultSet -> {
@@ -146,6 +132,6 @@ public class TodoController {
                 return null;
             }
         }, id, password);
-    }
+    }*/
 
 }
