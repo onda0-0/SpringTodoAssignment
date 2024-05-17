@@ -20,7 +20,7 @@ public class TodoResponseDto {
         this.username = todo.getUsername();
         this.title = todo.getTitle();
         this.contents = todo.getContents();
-        this.createdAt=getCreatedAt();
-        this.updatedAt=getUpdatedAt();
+        this.createdAt=todo.getCreatedAt();
+        this.updatedAt=todo.getUpdatedAt();
     }
 }
