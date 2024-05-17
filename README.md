@@ -112,9 +112,10 @@ URL: /todos/{id}/delete
 Method: POST
 Path Variable:
 id: long (일정의 고유 식별자)
+request
 ```
 json
-request
+
 {
     "password": "string"
 }
