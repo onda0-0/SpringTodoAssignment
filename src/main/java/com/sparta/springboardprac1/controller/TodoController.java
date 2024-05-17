@@ -102,6 +102,11 @@ public class TodoController {
             throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
         }
 
+        // 비밀번호 확인
+        if (!todo.getPassword().equals(requestDto.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
         todo.setTitle(requestDto.getTitle());
         todo.setContents(requestDto.getContents());
         todo.setPassword(requestDto.getPassword());
@@ -113,9 +118,21 @@ public class TodoController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTodo(@PathVariable Long id) {
-        String sql = "DELETE FROM todo WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+    public void deleteTodo(@PathVariable Long id, @RequestBody TodoRequestDto requestDto) {
+        String sqlSelect = "SELECT * FROM todo WHERE id = ?";
+        Todo todo = jdbcTemplate.queryForObject(sqlSelect, new Object[]{id}, todoRowMapper());
+
+        if (todo == null) {
+            throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
+        }
+
+        // 비밀번호 확인
+        if (!todo.getPassword().equals(requestDto.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        String sqlDelete = "DELETE FROM todo WHERE id = ?";
+        jdbcTemplate.update(sqlDelete, id);
     }
 
    /* private Todo findIdPwd(Long id, String password) {
