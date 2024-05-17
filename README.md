@@ -51,6 +51,7 @@ json
 URL: /todos
 Method: GET
 Response
+
 [
 {
     "id": "long",
@@ -62,12 +63,14 @@ Response
 }...
 ]
 
-3. 선택 일정 조회
+4. 선택 일정 조회
 URL: /todos/{id}
 Method: GET
 Path Variable:
 id: long (일정의 고유 식별자)
 Response:
+```
+json
 {
     "id": "long",
     "username": "string",
@@ -76,20 +79,25 @@ Response:
     "createdAt": "timestamp",
     "updatedAt": "timestamp"
 }
+```
 
-4. 선택 일정 수정
+6. 선택 일정 수정
 URL: /todos/{id}
 Method: PUT
 Path Variable:
 id: long (일정의 고유 식별자)
 
+```
+json
 {
     "title": "string",
     "contents": "string",
     "password": "string"
 }
-
+```
 response
+```
+json
 {
     "id": "long",
     "username": "string",
@@ -98,14 +106,16 @@ response
     "createdAt": "timestamp",
     "updatedAt": "timestamp"
 }
-
+```
 5. 선택 일정 삭제
 URL: /todos/{id}/delete
 Method: POST
 Path Variable:
 id: long (일정의 고유 식별자)
-
+```
+json
 request
 {
     "password": "string"
 }
+```
