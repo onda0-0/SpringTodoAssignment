@@ -1,6 +1,7 @@
 package com.sparta.springboardprac1.repository;
 
 import com.sparta.springboardprac1.entity.Todo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -16,6 +17,7 @@ import java.util.List;
 public class TodoRepository {
     private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public TodoRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }

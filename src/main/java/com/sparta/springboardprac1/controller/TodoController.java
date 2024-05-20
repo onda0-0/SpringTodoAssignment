@@ -3,6 +3,7 @@ package com.sparta.springboardprac1.controller;
 import com.sparta.springboardprac1.dto.TodoRequestDto;
 import com.sparta.springboardprac1.dto.TodoResponseDto;
 import com.sparta.springboardprac1.service.TodoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 public class TodoController {
     private final TodoService todoService;
 
+    @Autowired
     public TodoController(TodoService todoService) {
         this.todoService = todoService;
     }

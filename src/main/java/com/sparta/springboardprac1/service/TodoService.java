@@ -4,6 +4,7 @@ import com.sparta.springboardprac1.dto.TodoRequestDto;
 import com.sparta.springboardprac1.dto.TodoResponseDto;
 import com.sparta.springboardprac1.entity.Todo;
 import com.sparta.springboardprac1.repository.TodoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class TodoService {
     private final TodoRepository todoRepository;
 
+    @Autowired
     public TodoService(TodoRepository todoRepository) {
         this.todoRepository = todoRepository;
     }
