@@ -4,6 +4,9 @@ import com.sparta.springboardprac1.dto.CommentRequestDto;
 import com.sparta.springboardprac1.dto.CommentResponseDto;
 import com.sparta.springboardprac1.entity.Comment;
 import com.sparta.springboardprac1.entity.Todo;
+import com.sparta.springboardprac1.exception.BadRequestException;
+import com.sparta.springboardprac1.exception.ForbiddenException;
+import com.sparta.springboardprac1.exception.NotFoundException;
 import com.sparta.springboardprac1.repository.CommentRepository;
 import com.sparta.springboardprac1.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +29,8 @@ public class CommentService {
 
     @Transactional
     public CommentResponseDto createComment(CommentRequestDto requestDto) {
-        if (requestDto.getTodoId() == null) {
-            throw new IllegalArgumentException("일정 ID가 입력되지 않았습니다.");
-        }
-        if (requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
-            throw new IllegalArgumentException("댓글 내용이 비어 있습니다.");
+        if (requestDto.getTodoId() == null || requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
+            throw new BadRequestException("일정 ID와 댓글 내용은 필수입니다.");
         }
 
         Todo todo = todoRepository.findById(requestDto.getTodoId())
@@ -47,20 +47,29 @@ public class CommentService {
 
     @Transactional
     public CommentResponseDto updateComment(Long id, CommentRequestDto requestDto) {
+        if (requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
+            throw new BadRequestException("댓글 내용은 필수입니다.");
+        }
+
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("선택한 댓글은 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("선택한 댓글은 존재하지 않습니다."));
 
         if (!comment.getUsername().equals(requestDto.getUsername())) {
-            throw new IllegalArgumentException("해당 댓글의 사용자가 아닙니다.");
+            throw new ForbiddenException("해당 댓글의 사용자가 아닙니다.");
         }
+
         comment.setContent(requestDto.getContent());
         return new CommentResponseDto(comment);
     }
 
     @Transactional
-    public void deleteComment(Long id) {
+    public void deleteComment(Long id, String username) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("선택한 댓글은 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("선택한 댓글은 존재하지 않습니다."));
+
+        if (!comment.getUsername().equals(username)) {
+            throw new ForbiddenException("해당 댓글의 사용자가 아닙니다.");
+        }
         commentRepository.delete(comment);
     }
 }
