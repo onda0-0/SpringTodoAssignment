@@ -3,6 +3,7 @@ package com.sparta.springboardprac1.controller;
 import com.sparta.springboardprac1.dto.CommentRequestDto;
 import com.sparta.springboardprac1.dto.CommentResponseDto;
 import com.sparta.springboardprac1.service.CommentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public CommentResponseDto createComment(@RequestBody CommentRequestDto requestDto) {
+    public CommentResponseDto createComment(@Valid @RequestBody CommentRequestDto requestDto) {
         return commentService.createComment(requestDto);
     }
 
@@ -29,7 +30,7 @@ public class CommentController {
     }
 
     @PutMapping("/{id}")
-    public CommentResponseDto updateComment(@PathVariable Long id, @RequestBody CommentRequestDto requestDto) {
+    public CommentResponseDto updateComment(@PathVariable Long id,@Valid @RequestBody CommentRequestDto requestDto) {
         return commentService.updateComment(id, requestDto);
     }
 

@@ -3,6 +3,7 @@ package com.sparta.springboardprac1.controller;
 import com.sparta.springboardprac1.dto.TodoRequestDto;
 import com.sparta.springboardprac1.dto.TodoResponseDto;
 import com.sparta.springboardprac1.service.TodoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class TodoController {
     }
 
     @PostMapping
-    public TodoResponseDto createTodo(@RequestBody TodoRequestDto requestDto) {
+    public TodoResponseDto createTodo(@Valid @RequestBody TodoRequestDto requestDto) {
         return todoService.createTodo(requestDto);
         //TodoResponseDto todoResponseDto = todoService.createTodo(requestDto);
         //return ResponseEntity.status(201).body(todoResponseDto); // 201 Created
@@ -37,12 +38,12 @@ public class TodoController {
     }
 
     @PutMapping("/{id}")
-    public TodoResponseDto updateTodo(@PathVariable Long id, @RequestBody TodoRequestDto requestDto) {
+    public TodoResponseDto updateTodo(@PathVariable Long id, @Valid @RequestBody TodoRequestDto requestDto) {
         return todoService.updateTodo(id, requestDto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTodo(@PathVariable Long id, @RequestBody TodoRequestDto requestDto) {
+    public void deleteTodo(@PathVariable Long id, @Valid @RequestBody TodoRequestDto requestDto) {
         todoService.deleteTodo(id, requestDto);
     }
 }
