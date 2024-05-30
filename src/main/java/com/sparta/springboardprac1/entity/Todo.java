@@ -9,13 +9,14 @@ import lombok.Setter;
 import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @Table(name="todo")
 @NoArgsConstructor
-public class Todo extends Timestamped{
+public class  Todo extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +28,8 @@ public class Todo extends Timestamped{
     private String contents;
     @Column(name = "password", nullable = false)
     private String password;
-
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
     public Todo(TodoRequestDto requestDto) {
         this.username=requestDto.getUsername();

@@ -4,6 +4,7 @@ import com.sparta.springboardprac1.dto.TodoRequestDto;
 import com.sparta.springboardprac1.dto.TodoResponseDto;
 import com.sparta.springboardprac1.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public class TodoController {
     @PostMapping
     public TodoResponseDto createTodo(@RequestBody TodoRequestDto requestDto) {
         return todoService.createTodo(requestDto);
+        //TodoResponseDto todoResponseDto = todoService.createTodo(requestDto);
+        //return ResponseEntity.status(201).body(todoResponseDto); // 201 Created
     }
 
     @GetMapping
