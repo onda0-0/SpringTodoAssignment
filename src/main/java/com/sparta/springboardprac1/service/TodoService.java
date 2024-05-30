@@ -5,7 +5,9 @@ import com.sparta.springboardprac1.dto.TodoResponseDto;
 import com.sparta.springboardprac1.entity.Todo;
 import com.sparta.springboardprac1.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -21,50 +23,52 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
+    @Transactional
     public TodoResponseDto createTodo(TodoRequestDto requestDto) {
+        // RequestDto -> Entity
         Todo todo = new Todo(requestDto);
-        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-        todo.setCreatedAt(now);
-        todo.setUpdatedAt(now);
-        todoRepository.save(todo);
-        return new TodoResponseDto(todo);
+        // DB 저장
+        Todo saveTodo = todoRepository.save(todo);
+        // Entity -> ResponseDto
+        TodoResponseDto todoResponseDto = new TodoResponseDto(saveTodo);
+
+        return todoResponseDto;
     }
 
     public List<TodoResponseDto> getAllTodos() {
-        List<Todo> todos = todoRepository.findAll();
+        //DB조회
+        List<Todo> todos = todoRepository.findAllByOrderByUpdatedAtDesc();
         return todos.stream().map(TodoResponseDto::new).collect(Collectors.toList());
     }
 
     public TodoResponseDto getTodoById(Long id) {
-        Todo todo = todoRepository.findById(id);
+        Todo todo= todoRepository.findById(id).orElseThrow(()
+                -> new IllegalArgumentException("선택한 메모는 존재하지 않습니다."));
         return new TodoResponseDto(todo);
     }
 
-    public TodoResponseDto updateTodo(Long id, TodoRequestDto requestDto) {
-        Todo todo = todoRepository.findById(id);
-        if (todo == null) {
-            throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
-        }
+    @Transactional
+    public TodoResponseDto  updateTodo(Long id, TodoRequestDto requestDto) {
+        // 해당 일정이 DB에 존재하는지 확인
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("선택한 일정은 존재하지 않습니다."));
         if (!todo.getPassword().equals(requestDto.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         todo.setTitle(requestDto.getTitle());
         todo.setContents(requestDto.getContents());
         todo.setPassword(requestDto.getPassword());
-        todo.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
-        todoRepository.update(todo);
         return new TodoResponseDto(todo);
     }
 
+    @Transactional
     public void deleteTodo(Long id, TodoRequestDto requestDto) {
-        Todo todo = todoRepository.findById(id);
-        if (todo == null) {
-            throw new IllegalArgumentException("선택한 일정은 존재하지 않습니다.");
-        }
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("선택한 일정은 존재하지 않습니다."));
         if (!todo.getPassword().equals(requestDto.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        todoRepository.delete(id);
+        todoRepository.delete(todo);
     }
 }
 

@@ -2,6 +2,7 @@ package com.sparta.springboardprac1.entity;
 
 
 import com.sparta.springboardprac1.dto.TodoRequestDto;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,19 +10,23 @@ import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
 
+@Entity
 @Getter
 @Setter
+@Table(name="todo")
 @NoArgsConstructor
-public class Todo {
+public class Todo extends Timestamped{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name="username", nullable = false)
     private String username;
+    @Column(name = "title", nullable = false)
     private String title;
+    @Column(name = "contents", nullable = false, length = 500)
     private String contents;
+    @Column(name = "password", nullable = false)
     private String password;
-    // 현재 날짜와 시간으로 객체 생성
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
-
 
 
     public Todo(TodoRequestDto requestDto) {
@@ -30,4 +35,5 @@ public class Todo {
         this.contents=requestDto.getContents();
         this.password=requestDto.getPassword();
     }
+
 }
