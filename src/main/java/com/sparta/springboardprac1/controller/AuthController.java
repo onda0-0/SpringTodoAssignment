@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/todos")
 public class AuthController {
 
     private final UserService userService;
 
-    @GetMapping("/user/login")
+    /*@GetMapping("/user/login")
     public String loginPage() {
         return "login";
     }
@@ -32,7 +32,7 @@ public class AuthController {
     @GetMapping("/user/signup")
     public String signupPage() {
         return "signup";
-    }
+    }*/
 
     @PostMapping("/user/signup")
     public String signup(@Valid RegisterRequestDto requestDto, BindingResult bindingResult) {
@@ -42,12 +42,12 @@ public class AuthController {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
             }
-            return "redirect:/api/user/signup";
+            return "Validation error";
         }
 
         userService.signup(requestDto);
 
-        return "redirect:/todos/user/login";
+        return "Signup successful";
     }
 
     // 회원 관련 정보 받기
