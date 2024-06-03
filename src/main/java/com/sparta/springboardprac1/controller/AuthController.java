@@ -35,7 +35,7 @@ public class AuthController {
     }*/
 
     @PostMapping("/user/signup")
-    public String signup(@Valid RegisterRequestDto requestDto, BindingResult bindingResult) {
+    public String signup(@Valid @RequestBody RegisterRequestDto requestDto, BindingResult bindingResult) { //@RequestBody추가. 이걸 넣지않아서 회원가입시 데이터를 보내도 입력됨을 인식하지 못함.
         // Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if(fieldErrors.size() > 0) {
@@ -46,7 +46,6 @@ public class AuthController {
         }
 
         userService.signup(requestDto);
-
         return "Signup successful";
     }
 
